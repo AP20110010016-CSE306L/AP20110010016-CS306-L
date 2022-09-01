@@ -1,107 +1,111 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <malloc.h>
 #include <string.h>
+int size = 0;
 
-struct Symbol
+struct symbtab
 {
-    char label[100];
-    int address;
-};
+    char label[10];
+    int addr;
+    struct symbtab *next;
+} * first, *last;
 
-struct Symbol table[10][50];
-int indexes[10] = {0};
-
-int main(int argc, char **argv)
+int search(char lab[])
 {
+    int i, flag = 0;
+    struct symbtab *temp;
+    temp = first;
+    for (i = 0; i < size; i++)
+    {
+        if (strcmp(temp->label, lab) == 0)
+        {
+            flag = 1;
+            break;
+        }
+        temp = temp->next;
+    }
+    return flag;
+}
 
-    int choice;
+void insert()
+{
+    int n;
+    char l[10];
+    printf("Enter the label: ");
+    scanf("%s", l);
+    n = search(l);
+    if (n == 1)
+        printf("The label is already in the symbol table. Duplicate cant be inserted\n");
+    else
+    {
+        struct symbtab *p;
+        p = malloc(sizeof(struct symbtab));
+        strcpy(p->label, l);
+        printf("Enter the address: ");
+        scanf("%d", &p->addr);
+        p->next = NULL;
+        if (size == 0)
+        {
+            first = p;
+            last = p;
+        }
+        else
+        {
+            last->next = p;
+            last = p;
+        }
+        size++;
+    }
+}
 
+void display()
+{
+    int i;
+    struct symbtab *p;
+    p = first;
+    printf("\nLABEL\tADDRESS\n");
+    for (i = 0; i < size; i++)
+    {
+        printf("%s\t%d\n", p->label, p->addr);
+        p = p->next;
+    }
+}
+
+void main()
+{
+    int option;
+    int y;
+    char la[10];
     do
     {
-        printf("\nSYMBOL TABLE (HASH TABLE)\n");
-        printf("\n1. INSERT");
-        printf("\n2. SEARCH");
-        printf("\n3. DISPLAY\n");
-        printf("\n0. EXIT");
-
-        printf("\n\nInput your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice)
+        printf("\nSYMBOL TABLE IMPLEMENTATION\n");
+        printf("1.INSERT\n");
+        printf("2.DISPLAY\n");
+        printf("3.SEARCH\n");
+        printf("4.END\n");
+        printf("\nEnter your option: ");
+        scanf("%d", &option);
+        switch (option)
         {
-        case 0:
-        {
-            break;
-        }
         case 1:
-        {
-            int n;
-            printf("\nInput the number of symbols to input: ");
-            scanf("%d", &n);
-
-            for (int i = 0; i < n; i++)
-            {
-                struct Symbol symbol;
-                printf("\nSymbol %d:", i + 1);
-                printf("\nInput address: ");
-                scanf("%d", &symbol.address);
-                printf("Input label: ");
-                scanf("%s", symbol.label);
-
-                int len = strlen(symbol.label);
-                int hash = len % 10;
-
-                table[hash][indexes[hash]] = symbol;
-                indexes[hash]++;
-            }
+            insert();
+            printf("\nSuccessfully inserted\n");
             break;
-        }
         case 2:
-        {
-            char label[100];
-            printf("\nInput the label to search: ");
-            scanf("%s", label);
-
-            int len = strlen(label);
-            int hash = len % 10;
-
-            int found = 0;
-            for (int i = 0; i < indexes[hash]; i++)
-            {
-                if (strcmp(label, table[hash][i].label) == 0)
-                {
-                    printf("\nSymbol found!\n");
-                    printf("\nAddress: %d", table[hash][i].address);
-                    printf("\nLabel: %s\n", table[hash][i].label);
-                    found = 1;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                printf("\nSymbol not found!\n");
-            }
+            display();
             break;
-        }
         case 3:
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < indexes[i]; j++)
-                {
-                    printf("%d\t%s\n", table[i][j].address, table[i][j].label);
-                }
-            }
+            printf("Enter the label to be searched: ");
+            scanf("%s", la);
+            y = search(la);
+            if (y == 1)
+                printf("The label is already in the symbol table\n");
+            else
+                printf("The label is not found in the symbol tablel\n");
             break;
+        case 4:
+            exit(0);
         }
-        default:
-        {
-            printf("\nInvalid option!\n");
-        }
-        }
-
-    } while (choice);
-
-    return 0;
+    } while (option < 6);
 }
