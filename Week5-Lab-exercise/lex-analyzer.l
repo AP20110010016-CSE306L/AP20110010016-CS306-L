@@ -45,3 +45,17 @@ void store_symb_tab(char *id)
         if (strcmp(id, symb_tab[i]) == 0)
         {
             printf("%s - already in symbol table\n", id);
+            flag = 1;
+        }
+    }
+    if (flag == 0)
+    {
+        printf("%s - stored in symbol table\n", id);
+        strcpy(symb_tab[idx], id);
+        idx++;
+    }
+}
+
+int yywrap() {
+    return 1;
+}
